@@ -59,7 +59,7 @@ end
 """
     hyperparams(names...; prefix="$SAGEMAKER_PREFIX")
 
-As per [hyperparam](@ref), but taking multiple names and returning a `NamedTuple`.
+As per [`hyperparam`](@ref), but taking multiple names and returning a `NamedTuple`.
 ```jldoctest
 using EISJobs
 ENV["$(SAGEMAKER_PREFIX)A"] = "5"
@@ -92,7 +92,7 @@ end
 """
     report_hyperparameters(save_dir::AbstractPath)
 
-Saves the cached HYPERPARAMETERS to a JSON file named "hyperparameters.json" in the `save_dir`
+Saves the cached `HYPERPARAMETERS` to a JSON file named "hyperparameters.json" in the `save_dir`
 and prints each key-value pair to the logger.
 
 The regex to extract the components is: `hyperparameters: (?<key>)=(?<value>)`.
