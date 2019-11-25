@@ -15,9 +15,9 @@
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2")
 
         # Log if type changes
-        @test_log JOBS_LOGGER "notice" "type of HYPERPARAMETERS[:hpa]" hyperparam(Int, :hpa)
+        @test_log LOGGER "notice" "type of HYPERPARAMETERS[:hpa]" hyperparam(Int, :hpa)
         # No log if value is unchanged
-        @test_nolog JOBS_LOGGER "notice" "HYPERPARAMETERS[:hpa]" hyperparam(Int, :hpa)
+        @test_nolog LOGGER "notice" "HYPERPARAMETERS[:hpa]" hyperparam(Int, :hpa)
         hp = HYPERPARAMETERS[:hpa]
         @test hp == 1
         @test hp isa Int
@@ -27,7 +27,7 @@
         @test hp == "3"
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => "3")
         # Log if old value != new value
-        @test_log JOBS_LOGGER "notice" "Overwriting HYPERPARAMETERS[:hpc]" hyperparam(Int, :hpc, "OTHER_")
+        @test_log LOGGER "notice" "Overwriting HYPERPARAMETERS[:hpc]" hyperparam(Int, :hpc, "OTHER_")
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => 3)
 
         # No Key
@@ -61,7 +61,7 @@
         push!(HYPERPARAMETERS, :hpa => 1.0, :hpb => "2", :hpc => 3)
 
         mktmpdir() do dir
-            @test_log JOBS_LOGGER "info" "hyperparameters: hpb=2" EISJobs.report_hyperparameters(dir)
+            @test_log LOGGER "info" "hyperparameters: hpb=2" EISJobs.report_hyperparameters(dir)
             contents = read(dir / "hyperparameters.json", String)
             @test occursin("\"hpb\": \"2\"", contents)
             @test occursin("\"hpa\": 1.0", contents)
