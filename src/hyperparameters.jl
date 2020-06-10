@@ -9,7 +9,8 @@ const SAGEMAKER_PREFIX = "SM_HP_"
 # Grabs hyperparameter from environment variables
 _get_hyperparam(name::Symbol, prefix::AbstractString)= ENV[uppercase(string(prefix, name))]
 
-# Logs if a hyperparameter changes values during processing
+# Records a hyper-parameter into global HYPERPARAMETERS dict for later reporting
+# Logs if a hyperparameter is set twice to two difference values
 function _set_hyperparam(name::Symbol, value)
     if haskey(HYPERPARAMETERS, name)
         orig = HYPERPARAMETERS[name]
@@ -43,14 +44,16 @@ hyperparam(:power_level, "HP_")
 9001.0
 ```
 """
-hyperparam(name::Symbol, prefix::AbstractString=SAGEMAKER_PREFIX) = hyperparam(Float64, name, prefix)
-function hyperparam(T::Type, name::Symbol, prefix::AbstractString=SAGEMAKER_PREFIX)
+function hyperparam(name::Symbol; prefix::AbstractString=SAGEMAKER_PREFIX)
+    return hyperparam(Float64, name; prefix=prefix)
+end
+function hyperparam(T::Type, name::Symbol; prefix::AbstractString=SAGEMAKER_PREFIX)
     value = parse(T, _get_hyperparam(name, prefix))
     _set_hyperparam(name, value)
     return value
 end
 
-function hyperparam(::Type{String}, name::Symbol, prefix::AbstractString=SAGEMAKER_PREFIX)
+function hyperparam(::Type{String}, name::Symbol; prefix::AbstractString=SAGEMAKER_PREFIX)
     value = _get_hyperparam(name, prefix)
     _set_hyperparam(name, value)
     return value
@@ -78,12 +81,12 @@ function hyperparams(
     types::Union{Nothing, AbstractVector{<:Type}}=nothing
 )
     parameters = if types === nothing
-        (name => hyperparam(name, prefix) for name in names)
+        (name => hyperparam(name; prefix=prefix) for name in names)
     else
         length(names) == length(types) || throw(ArgumentError(
             "Number of `names` and `types` must be equal $(length(names)) != $(length(types))"
         ))
-        (name => hyperparam(type, name, prefix) for (name, type) in zip(names, types))
+        (name => hyperparam(type, name; prefix=prefix) for (name, type) in zip(names, types))
     end
 
     return (; parameters...)

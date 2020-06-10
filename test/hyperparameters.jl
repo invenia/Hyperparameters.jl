@@ -23,17 +23,17 @@
         @test hp isa Int
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2")
 
-        hp = hyperparam(String, :hpc, "OTHER_")
+        hp = hyperparam(String, :hpc; prefix="OTHER_")
         @test hp == "3"
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => "3")
         # Log if old value != new value
-        @test_log LOGGER "notice" "Overwriting HYPERPARAMETERS[:hpc]" hyperparam(Int, :hpc, "OTHER_")
+        @test_log LOGGER "notice" "Overwriting HYPERPARAMETERS[:hpc]" hyperparam(Int, :hpc; prefix="OTHER_")
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => 3)
 
         # No Key
-        @test_throws KeyError hyperparam(:hpa, "OTHER_")
+        @test_throws KeyError hyperparam(:hpa; prefix="OTHER_")
         # Parse error
-        @test_throws ArgumentError hyperparam(:hpd, "OTHER_")
+        @test_throws ArgumentError hyperparam(:hpd; prefix="OTHER_")
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => 3)
 
         empty!(HYPERPARAMETERS)
