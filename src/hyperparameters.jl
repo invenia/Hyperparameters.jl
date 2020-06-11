@@ -38,7 +38,7 @@ This function is generally expected to be used with SageMaker, and supplies the 
 ```jldoctest
 using EISJobs
 ENV["HP_POWER_LEVEL"] = "9001"
-hyperparam(:power_level, "HP_")
+hyperparam(:power_level; prefix="HP_")
 
 # output
 9001.0
