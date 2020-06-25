@@ -5,3 +5,5 @@
 [![Build Status](https://travis-ci.com/invenia/Hyperparameters.jl.svg?branch=master)](https://travis-ci.com/invenia/Hyperparameters.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/invenia/Hyperparameters.jl?svg=true)](https://ci.appveyor.com/project/invenia/Hyperparameters-jl)
 [![Codecov](https://codecov.io/gh/invenia/Hyperparameters.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/Hyperparameters.jl)
+
+A minimal utility for working with AWS Sagemaker hyperparameters.

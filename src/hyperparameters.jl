@@ -1,3 +1,14 @@
+module Hyperparameters
+
+using FilePathsBase: AbstractPath, /
+using JSON
+using Memento
+
+export HYPERPARAMETERS, hyperparam, hyperparams, report_hyperparameters
+
+const MODULE = @__MODULE__
+const LOGGER = getlogger(MODULE)
+
 """
     HYPERPARAMETERS::Dict{Symbol, Any}
 
@@ -101,5 +112,18 @@ and prints each key-value pair to the logger.
 The regex to extract the components is: `hyperparameters: (?<key>)=(?<value>)`.
 """
 function report_hyperparameters(save_dir::AbstractPath)
-    report_and_save(save_dir, "hyperparameters", HYPERPARAMETERS)
+    for (key, value) in pairs(HYPERPARAMETERS)
+        info(LOGGER, "hyperparameters: $key=$value")
+    end
+
+    file = save_dir / "hyperparameters.json"
+    info(LOGGER, "Report: saving at $file")
+
+    open(file, "w") do fh
+        JSON.print(fh, HYPERPARAMETERS, 4)  # 4 space indenting
+    end
+
+    return file
 end
+
+end # module

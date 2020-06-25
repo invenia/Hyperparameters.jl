@@ -61,8 +61,8 @@
         push!(HYPERPARAMETERS, :hpa => 1.0, :hpb => "2", :hpc => 3)
 
         mktmpdir() do dir
-            @test_log LOGGER "info" "hyperparameters: hpb=2" EISJobs.report_hyperparameters(dir)
-            contents = read(dir / "hyperparameters.json", String)
+            @test_log LOGGER "info" "hyperparameters: hpb=2" report_hyperparameters(dir)
+            contents = read(joinpath(dir, "hyperparameters.json"), String)
             @test occursin("\"hpb\": \"2\"", contents)
             @test occursin("\"hpa\": 1.0", contents)
             @test occursin("\"hpc\": 3", contents)

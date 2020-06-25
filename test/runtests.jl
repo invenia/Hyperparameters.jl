@@ -1,6 +1,14 @@
 using Hyperparameters
+
+using FilePathsBase
+using JSON
+using Memento
+using Memento.TestUtils
+
 using Test
 
+const LOGGER = getlogger()
+
 @testset "Hyperparameters.jl" begin
-    # Write your own tests here.
+    include("hyperparameters.jl")
 end
