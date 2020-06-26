@@ -28,6 +28,7 @@ function _set_hyperparam(name::Symbol, value)
         if orig != value
             notice(LOGGER, "Overwriting HYPERPARAMETERS[:$name] from $(repr(orig)) to $(repr(value)).")
         elseif typeof(orig) != typeof(value)
+            # Equal value but different type.
             notice(
                 LOGGER,
                 "Changing type of HYPERPARAMETERS[:$name] from $(typeof(orig)) to $(typeof(value))."
@@ -47,7 +48,7 @@ parsing it as type `T` (default: `Float64`).
 Also stores the hyperparameter and its value in the global `HYPERPARAMETERS` dictionary.
 This function is generally expected to be used with SageMaker, and supplies the default prefix for it.
 ```jldoctest
-using EISJobs
+using Hyperparameters
 ENV["HP_POWER_LEVEL"] = "9001"
 hyperparam(:power_level; prefix="HP_")
 

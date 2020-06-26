@@ -7,3 +7,5 @@
 [![Codecov](https://codecov.io/gh/invenia/Hyperparameters.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/Hyperparameters.jl)
 
 A minimal utility for working with AWS Sagemaker hyperparameters.
+
+Read environment variables with parsing, and remember what you've done so can write it back out at the end.
