@@ -5,6 +5,7 @@ os:
   - osx
 julia:
   - 1.0
+  - 1 # Latest stable release
   - nightly
 notifications:
   email: false
