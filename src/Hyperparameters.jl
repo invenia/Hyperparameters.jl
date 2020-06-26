@@ -47,7 +47,7 @@ parsing it as type `T` (default: `Float64`).
 Also stores the hyperparameter and its value in the global `HYPERPARAMETERS` dictionary.
 This function is generally expected to be used with SageMaker, and supplies the default prefix for it.
 ```jldoctest
-using EISJobs
+using Hyperparameters
 ENV["HP_POWER_LEVEL"] = "9001"
 hyperparam(:power_level; prefix="HP_")
 
@@ -75,7 +75,7 @@ end
 
 As per [`hyperparam`](@ref), but taking multiple names and returning a `NamedTuple`.
 ```jldoctest
-using EISJobs
+using Hyperparameters
 ENV["$(SAGEMAKER_PREFIX)A"] = "5"
 ENV["$(SAGEMAKER_PREFIX)B"] = "1.22"
 hyperparams(:a, :b, types=[Int, Float64])
