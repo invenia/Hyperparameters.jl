@@ -4,7 +4,7 @@ using FilePathsBase: AbstractPath, /
 using JSON
 using Memento
 
-export HYPERPARAMETERS, hyperparam, hyperparams, report_hyperparameters
+export HYPERPARAMETERS, hyperparam, hyperparams, report_hyperparameters, save_hyperparam
 
 const MODULE = @__MODULE__
 const LOGGER = getlogger(MODULE)
@@ -20,7 +20,7 @@ const SAGEMAKER_PREFIX = "SM_HP_"
 # Grabs hyperparameter from environment variables
 _get_hyperparam(name::Symbol, prefix::AbstractString)= ENV[uppercase(string(prefix, name))]
 
-# Records a hyper-parameter into global HYPERPARAMETERS dict for later reporting
+# Records a hyperparameter into global HYPERPARAMETERS dict for later reporting
 # Logs if a hyperparameter is set twice to two difference values
 function _set_hyperparam(name::Symbol, value)
     if haskey(HYPERPARAMETERS, name)
@@ -40,7 +40,7 @@ end
 """
     hyperparam([T::Type=Float64,] name; prefix="$SAGEMAKER_PREFIX"))
 
-Load the hyperparameter with the given `name` from the enviroment variable
+Load the hyperparameter with the given `name` from the environment variable
 named with the name in uppercase, and prefixed with `prefix`
 parsing it as type `T` (default: `Float64`).
 
@@ -101,6 +101,16 @@ function hyperparams(
     end
 
     return (; parameters...)
+end
+
+"""
+    save_hyperparam(name::Symbol, value, prefix::AbstractString="")
+
+Save value to the enviroment variables and the global `HYPERPARAMETERS` dictionary.
+"""
+function save_hyperparam(name::Symbol, value; prefix::AbstractString="")
+    ENV[uppercase(string(prefix, name))] = string(value)
+    _set_hyperparam(name, value)
 end
 
 """

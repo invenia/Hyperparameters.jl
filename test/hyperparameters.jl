@@ -53,6 +53,11 @@
         @test hp.hpa isa Int
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => 3)
         @test HYPERPARAMETERS[:hpa] isa Int
+
+        save_hyperparam(:hpd, 4, prefix="OTHER_")
+        @test HYPERPARAMETERS[:hpd] isa Int
+        @test HYPERPARAMETERS[:hpd] == 4
+        @test ENV["OTHER_HPD"] == "4"
     end
 
     @testset "report_hyperparameters" begin
