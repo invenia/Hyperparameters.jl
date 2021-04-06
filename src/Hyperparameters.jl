@@ -17,8 +17,15 @@ Collection of all the hyperparameters, and their values accessed during this run
 const HYPERPARAMETERS = Dict{Symbol, Any}()
 const SAGEMAKER_PREFIX = "SM_HP_"
 
+
+_name_to_envvar(prefix, name) = uppercase(string(prefix, name))
+function _envvar_to_name(prefix, name)
+    startswith(name, prefix) || throw(DomainError(name, "should have prefix; $prefix"))
+    return Symbol(lowercase(SubString(name, length(prefix) + 1)))
+end
+
 # Grabs hyperparameter from environment variables
-_get_hyperparam(name::Symbol, prefix::AbstractString)= ENV[uppercase(string(prefix, name))]
+_get_hyperparam(name::Symbol, prefix::AbstractString)= ENV[_name_to_envvar(prefix, name)]
 
 # Records a hyperparameter into global HYPERPARAMETERS dict for later reporting
 # Logs if a hyperparameter is set twice to two difference values
@@ -109,20 +116,30 @@ end
 Save value to the enviroment variables and the global `HYPERPARAMETERS` dictionary.
 """
 function save_hyperparam(name::Symbol, value; prefix::AbstractString="")
-    ENV[uppercase(string(prefix, name))] = string(value)
+    ENV[_name_to_envvar(prefix, name)] = string(value)
     _set_hyperparam(name, value)
 end
 
 """
-    report_hyperparameters(save_dir::AbstractPath)
+    report_hyperparameters(save_dir::AbstractPath; prefix="$SAGEMAKER_PREFIX")
 
-Saves the cached `HYPERPARAMETERS` to a JSON file named "hyperparameters.json" in the `save_dir`
+Saves all hyperparameters to a JSON file named "hyperparameters.json" in the `save_dir`
 and prints each key-value pair to the logger.
+
+The hyperparameters are taken from the cached `HYPERPARAMETERS` dictionary of all that were
+used, combined with any enviroment variables matching the prefix.
+Where things occur in both, the cached dictionary takes precedence.
+Hyperparameters read from enviroment variables are all recorded as strings.
+(You can overwrite this by using them via `hyperparam(type, name)` before the report)
 
 The regex to extract the components is: `hyperparameters: (?<key>)=(?<value>)`.
 """
-function report_hyperparameters(save_dir::AbstractPath)
-    for (key, value) in pairs(HYPERPARAMETERS)
+function report_hyperparameters(save_dir::AbstractPath; prefix=SAGEMAKER_PREFIX)
+    env_hypers = Dict(
+        _envvar_to_name(prefix, k) => v for (k,v) in ENV if startswith(k, prefix)
+    )
+    all_hypers = merge(env_hypers, HYPERPARAMETERS)
+    for (key, value) in all_hypers
         info(LOGGER, "hyperparameters: $key=$value")
     end
 
@@ -130,7 +147,7 @@ function report_hyperparameters(save_dir::AbstractPath)
     info(LOGGER, "Report: saving at $file")
 
     open(file, "w") do fh
-        JSON.print(fh, HYPERPARAMETERS, 4)  # 4 space indenting
+        JSON.print(fh, all_hypers, 4)  # 4 space indenting
     end
 
     return file
