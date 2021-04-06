@@ -1,18 +1,18 @@
 @testset "hyperparameters" begin
     empty!(HYPERPARAMETERS)
 
-    withenv("SM_HP_HPA" => "1", "SM_HP_HPB" => "2", "OTHER_HPC" => "3", "OTHER_HPD" => "hi") do
+    withenv("SM_HP_HPA" => "1", "SM_HP_HPB" => "2", "OTHER_HPC" => "3.0", "OTHER_HPD" => "hi") do
         @test HYPERPARAMETERS == Dict()
 
-        hp = hyperparam(:hpa)
-        @test hp == 1
+        hp = hyperparam(Float64, :hpa)
+        @test hp == 1.0
         @test hp isa Float64
-        @test HYPERPARAMETERS == Dict(:hpa => 1)
+        @test HYPERPARAMETERS == Dict(:hpa => 1.0)
         @test HYPERPARAMETERS[:hpa] isa Float64
 
         hp = hyperparam(String, :hpb)
         @test hp == "2"
-        @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2")
+        @test HYPERPARAMETERS == Dict(:hpa => 1.0, :hpb => "2")
 
         # Log if type changes
         @test_log LOGGER "notice" "type of HYPERPARAMETERS[:hpa]" hyperparam(Int, :hpa)
@@ -24,16 +24,16 @@
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2")
 
         hp = hyperparam(String, :hpc; prefix="OTHER_")
-        @test hp == "3"
-        @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => "3")
+        @test hp == "3.0"
+        @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => "3.0")
         # Log if old value != new value
-        @test_log LOGGER "notice" "Overwriting HYPERPARAMETERS[:hpc]" hyperparam(Int, :hpc; prefix="OTHER_")
-        @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => 3)
+        @test_log LOGGER "notice" "Overwriting HYPERPARAMETERS[:hpc]" hyperparam(Float64, :hpc; prefix="OTHER_")
+        @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => 3.0)
 
         # No Key
         @test_throws KeyError hyperparam(:hpa; prefix="OTHER_")
         # Parse error
-        @test_throws ArgumentError hyperparam(:hpd; prefix="OTHER_")
+        @test_throws ArgumentError hyperparam(Float64, :hpd; prefix="OTHER_")
         @test HYPERPARAMETERS == Dict(:hpa => 1, :hpb => "2", :hpc => 3)
 
         empty!(HYPERPARAMETERS)
@@ -42,7 +42,7 @@
         hp = hyperparams(:hpc; prefix="OTHER_")
         @test hp == (hpc=3,)
         @test hp.hpc isa Float64
-        @test HYPERPARAMETERS == Dict(:hpc => 3)
+        @test HYPERPARAMETERS == Dict(:hpc => 3.0)
         @test HYPERPARAMETERS[:hpc] isa Float64
 
         @test_throws ArgumentError hyperparams(:hpa, :hpb; types=[Int, String, String])
@@ -81,4 +81,29 @@
         end
     end
 
+    @testset "_parse_hyper: guessing type correctly" begin
+        _parse_hyper = Hyperparameters._parse_hyper
+
+        @test _parse_hyper("true") isa Bool
+        @test _parse_hyper("true") == true
+        @test _parse_hyper("false") isa Bool
+        @test _parse_hyper("false") == false
+
+        @test _parse_hyper("1") isa Integer
+        @test _parse_hyper("1") == 1
+        @test _parse_hyper("-1") isa Integer
+        @test _parse_hyper("-1") == -1
+
+        @test _parse_hyper("2.0") isa AbstractFloat
+        @test _parse_hyper("2.0") == 2.0
+        @test _parse_hyper("-2.0") isa AbstractFloat
+        @test _parse_hyper("-2.0") == -2.0
+
+        @test _parse_hyper("three") isa AbstractString
+        @test _parse_hyper("three") == "three"
+
+        # if not matching julia lowercase convention get strings:
+        @test _parse_hyper("TRUE") isa AbstractString
+        @test _parse_hyper("True") isa AbstractString
+    end
 end

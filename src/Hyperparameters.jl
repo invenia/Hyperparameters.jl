@@ -45,11 +45,13 @@ function _set_hyperparam(name::Symbol, value)
 end
 
 """
-    hyperparam([T::Type=Float64,] name; prefix="$SAGEMAKER_PREFIX"))
+    hyperparam([T::Type,] name; prefix="$SAGEMAKER_PREFIX"))
 
 Load the hyperparameter with the given `name` from the environment variable
-named with the name in uppercase, and prefixed with `prefix`
-parsing it as type `T` (default: `Float64`).
+named with the name in uppercase, and prefixed with `prefix`.
+If the type `T` is passed then it will be parsed as that type,
+otherwise it will take a guess at the type chosing the first that passes successfully
+from `Bool`, `Int`, then `Float` then `String`
 
 Also stores the hyperparameter and its value in the global `HYPERPARAMETERS` dictionary.
 This function is generally expected to be used with SageMaker, and supplies the default prefix for it.
@@ -63,8 +65,9 @@ hyperparam(:power_level; prefix="HP_")
 ```
 """
 function hyperparam(name::Symbol; prefix::AbstractString=SAGEMAKER_PREFIX)
-    return hyperparam(Float64, name; prefix=prefix)
+    return hyperparam(nothing, name; prefix=prefix)
 end
+
 function hyperparam(T::Type, name::Symbol; prefix::AbstractString=SAGEMAKER_PREFIX)
     value = parse(T, _get_hyperparam(name, prefix))
     _set_hyperparam(name, value)
@@ -75,6 +78,27 @@ function hyperparam(::Type{String}, name::Symbol; prefix::AbstractString=SAGEMAK
     value = _get_hyperparam(name, prefix)
     _set_hyperparam(name, value)
     return value
+end
+
+function hyperparam(::Nothing, name::Symbol; prefix::AbstractString=SAGEMAKER_PREFIX)
+    # this one is adaptive to try and work out the type from the string.
+    value = _parse_hyper(_get_hyperparam(name, prefix))
+    _set_hyperparam(name, value)
+    return value
+end
+
+"""
+    _parse_hyper(value_string)
+    
+Guesses the type of the `value_string` and parses as that.
+"""
+function _parse_hyper(value_string)
+    return something(
+        tryparse(Bool, value_string),
+        tryparse(Int, value_string),
+        tryparse(Float64, value_string),
+        value_string,
+    )
 end
 
 """
