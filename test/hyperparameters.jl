@@ -65,7 +65,7 @@
         empty!(HYPERPARAMETERS)
 
         withenv("SM_HP_HPA" => "1", "SM_HP_HPB" => "2", "SM_HP_HPC" => "3") do
-            # we use hpa and hpb, but we hwant hpc to just be scoped from environment
+            # we use hpa and hpb, but we want hpc to just be scoped from environment
             # might not be as good as reading it so it knows the type, but better than losing it.
             hyperparam(:hpa)
             hyperparam(String, :hpb)

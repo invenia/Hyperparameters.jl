@@ -20,7 +20,7 @@ const SAGEMAKER_PREFIX = "SM_HP_"
 
 _name_to_envvar(prefix, name) = uppercase(string(prefix, name))
 function _envvar_to_name(prefix, name)
-    startswith(name, prefix) || throw(DomainError(name, "should have prefix; $prefix"))
+    startswith(name, prefix) || throw(DomainError(name, "Should have prefix; $prefix"))
     return Symbol(lowercase(SubString(name, length(prefix) + 1)))
 end
 
