@@ -89,7 +89,7 @@ end
 
 """
     _parse_hyper(value_string)
-    
+
 Guesses the type of the `value_string` and parses as that.
 """
 function _parse_hyper(value_string)
@@ -160,7 +160,8 @@ The regex to extract the components is: `hyperparameters: (?<key>)=(?<value>)`.
 """
 function report_hyperparameters(save_dir::AbstractPath; prefix=SAGEMAKER_PREFIX)
     env_hypers = Dict(
-        _envvar_to_name(prefix, k) => v for (k,v) in ENV if startswith(k, prefix)
+        _envvar_to_name(prefix, k) => _parse_hyper(v)
+        for (k, v) in ENV if startswith(k, prefix)
     )
     all_hypers = merge(env_hypers, HYPERPARAMETERS)
     for (key, value) in all_hypers
