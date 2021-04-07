@@ -5,6 +5,18 @@
 [![CI](https://github.com/Invenia/Hyperparameters.jl/workflows/CI/badge.svg)](https://github.com/Invenia/Hyperparameters.jl/actions?query=workflow%3ACI)
 [![Codecov](https://codecov.io/gh/invenia/Hyperparameters.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/invenia/Hyperparameters.jl)
 
-A minimal utility for working with AWS Sagemaker hyperparameters.
+A minimal utility for working with [AWS Sagemaker](https://aws.amazon.com/sagemaker/) hyperparameters.
+More broadly for dealing with environment variables.
+Two key functions:
+ - `hyperparam` reads the enviroment variable
+ - `
 
-Read environment variables with parsing, and remember what you've done so can write it back out at the end.
+
+For purposes of this example we have the following enviroment variables set:
+```julia
+ENV["SM_HP_FOO"] = "1"; ENV["SM_HP_BAR"] = "2"; ENV["SM_HP_BAZ"] = "three"; ENV["SM_HP_QUX"] = "-3.14";
+```
+Sagemaker prefixes the environment variables it automatically defines for hyperparameters with `SM_HP_`.
+
+
+We can access an enviroment variable by name using `hyperparam`:
