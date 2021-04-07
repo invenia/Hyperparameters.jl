@@ -94,12 +94,15 @@ Guesses the type of the `value_string` and parses as that.
 """
 function _parse_hyper(value_string)
     return something(
-        tryparse(Bool, value_string),
+        _strict_tryparse_bool(value_string),
         tryparse(Int, value_string),
         tryparse(Float64, value_string),
         value_string,
     )
 end
+
+# tryparse(Bool, "1") == true so can't use that. This is stricter
+_strict_tryparse_bool(x) = x == "true" ? true : x == "false" ? false : nothing
 
 """
     hyperparams(names...; prefix="$SAGEMAKER_PREFIX")

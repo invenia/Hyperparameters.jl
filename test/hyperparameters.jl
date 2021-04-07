@@ -89,21 +89,21 @@
         @test _parse_hyper("false") isa Bool
         @test _parse_hyper("false") == false
 
-        @test _parse_hyper("1") isa Integer
+        @test _parse_hyper("1") isa Int
         @test _parse_hyper("1") == 1
-        @test _parse_hyper("-1") isa Integer
+        @test _parse_hyper("-1") isa Int
         @test _parse_hyper("-1") == -1
 
-        @test _parse_hyper("2.0") isa AbstractFloat
+        @test _parse_hyper("2.0") isa Float64
         @test _parse_hyper("2.0") == 2.0
-        @test _parse_hyper("-2.0") isa AbstractFloat
+        @test _parse_hyper("-2.0") isa Float64
         @test _parse_hyper("-2.0") == -2.0
 
-        @test _parse_hyper("three") isa AbstractString
+        @test _parse_hyper("three") isa String
         @test _parse_hyper("three") == "three"
 
         # if not matching julia lowercase convention get strings:
-        @test _parse_hyper("TRUE") isa AbstractString
-        @test _parse_hyper("True") isa AbstractString
+        @test _parse_hyper("TRUE") isa String
+        @test _parse_hyper("True") isa String
     end
 end
