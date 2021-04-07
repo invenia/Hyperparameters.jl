@@ -63,14 +63,22 @@
     @testset "report_hyperparameters" begin
         # Ensure hyperparameters are what we expect
         empty!(HYPERPARAMETERS)
-        push!(HYPERPARAMETERS, :hpa => 1.0, :hpb => "2", :hpc => 3)
 
-        mktmpdir() do dir
-            @test_log LOGGER "info" "hyperparameters: hpb=2" report_hyperparameters(dir)
-            contents = read(joinpath(dir, "hyperparameters.json"), String)
-            @test occursin("\"hpb\": \"2\"", contents)
-            @test occursin("\"hpa\": 1.0", contents)
-            @test occursin("\"hpc\": 3", contents)
+        withenv("SM_HP_HPA" => "1", "SM_HP_HPB" => "2", "SM_HP_HPC" => "3") do
+            # we use hpa and hpb, but we want hpc to just be scoped from environment
+            # might not be as good as reading it so it knows the type, but better than losing it.
+            hyperparam(:hpa)
+            hyperparam(String, :hpb)
+
+            mktmpdir() do dir
+                @test_log LOGGER "info" "hyperparameters: hpb=2" report_hyperparameters(dir)
+
+                contents = read(joinpath(dir, "hyperparameters.json"), String)
+                @test occursin("\"hpa\": 1.0", contents)
+                @test occursin("\"hpb\": \"2\"", contents)
+                @test occursin("\"hpc\": \"3\"", contents)  # unused so is a string
+            end
         end
     end
+
 end
