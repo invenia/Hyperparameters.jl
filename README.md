@@ -66,6 +66,5 @@ The JSON file looks like:
 ```
 
 Notice two key things:
-1. Even though `qux` was never accessed during out code, it is still saved as the enviroment variable existed with the right prefix. It's type was found with the same mechanism used if the type is not provided to `hyperparam`. Which determined it was a `Float64` (and not a `String`).
+1. Even though `qux` was never accessed during our code, it is still saved as the environment variable existed with the right prefix. It's type was found with the same mechanism used if the type is not provided to `hyperparam`. Which determined it was a `Float64` (and not a `String`).
 2. When we accessed `bar` passing in the type, that type was remembered, so even though the enviroment variables just contained `2`, the report correctly read `2.0`
-
